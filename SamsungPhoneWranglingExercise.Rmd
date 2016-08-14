@@ -1,0 +1,37 @@
+---
+title: "SamsungPhoneCleanFile"
+author: "vz415"
+date: "August 14, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Samsung Phone Data Wrangling Exercise
+
+You should create one R script called run_analysis.R that does the following.
+
+1. Merges the training and the test sets to create one data set.
+
+2. Extracts columns containing mean and standard deviation for each measurement (Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R)
+
+3. Creates variables called ActivityLabel and ActivityName that label all observations with the corresponding activity labels and names respectively
+
+From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+```{r}
+# Merge training and test sets
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
