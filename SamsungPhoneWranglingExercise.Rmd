@@ -7,6 +7,21 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Load up the data by using list.files and merging the wanted files into a single dataframe
+setwd("/Users/vincent_zaballa/Documents/Springboard Data Program/Section 3 Data Wrangling/SamsungPhoneDataCleaning")
+file.list <- list.files()
+data <- read.table()
+
+# explore the data
+str(data)
+head(data)
+
+# Convert into a local data frame
+data <- tbl_df(data)
+
+# Load dplyr and tidyr packages to help tidy up the datasets.
+library("dplyr")
+library("tidyr")
 ```
 
 ## Samsung Phone Data Wrangling Exercise
