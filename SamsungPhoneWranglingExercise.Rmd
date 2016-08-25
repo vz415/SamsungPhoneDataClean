@@ -8,13 +8,43 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # Load up the data by using list.files and merging the wanted files into a single dataframe
-setwd("/Users/vincent_zaballa/Documents/Springboard Data Program/Section 3 Data Wrangling/SamsungPhoneDataCleaning")
-file.list <- list.files()
-data <- read.table()
+setwd("/Users/vincent_zaballa/Documents/Springboard Data Program/Section 3 Data Wrangling/SamsungPhoneDataCleaning/UCI HAR Dataset/")
+# Specify file paths using file.path
+# Test Data - subject test, x test, and y test
+test_file_subject_test <- read.table(file.path("test", "subject_test.txt"))
+test_file_X_test <- read.table(file.path("test", "X_test.txt"))
+test_file_y_test <- read.table(file.path("test", "y_test.txt"))
+# Test Data - one leve down and reading in all the data with acc & gyro
+test_file_Inertial_Signals <- file.path("test", "Inertial Signals", c("body_acc_x_test.txt",  "body_acc_y_test.txt",  "body_acc_z_test.txt", 
+"body_gyro_x_test.txt", "body_gyro_y_test.txt", "body_gyro_z_test.txt",
+"total_acc_x_test.txt", "total_acc_y_test.txt", "total_acc_z_test.txt"))
+test_signals <- lapply(test_file_Inertial_Signals, read.table)
 
-# explore the data
-str(data)
-head(data)
+# Repeat for training data
+# Train Data - subject train, x train, and y train
+train_file_subject_test <- read.table(file.path("train", "subject_train.txt"))
+train_file_X_test <- read.table(file.path("train", "X_train.txt"))
+train_file_y_test <- read.table(file.path("train", "y_train.txt"))
+# Test Data - one leve down and reading in all the data with acc & gyro
+train_file_Inertial_Signals <- file.path("train", "Inertial Signals", c("body_acc_x_train.txt",  "body_acc_y_train.txt",  "body_acc_z_train.txt", 
+"body_gyro_x_train.txt", "body_gyro_y_train.txt", "body_gyro_z_train.txt",
+"total_acc_x_train.txt", "total_acc_y_train.txt", "total_acc_z_train.txt"))
+train_signals <- lapply(train_file_Inertial_Signals, read.table)
+
+# Alright, so for the features, the data is within the files and the featurename is the file name... Need to figure out how to add together the file's data and then make a column name with the file's title
+
+# Function to process each file
+processFile <- function(f) {
+  df <- read.csv(f)
+  # ...and do stuff...
+  file.info(f)$size # dummy result
+}
+
+# Find all .csv files
+files <- dir("/foo/bar/", recursive=TRUE, full.names=TRUE, pattern="\\.csv$")
+
+# Apply the function to all files.
+result <- sapply(files, processFile)
 
 # Convert into a local data frame
 data <- tbl_df(data)
