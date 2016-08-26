@@ -19,7 +19,7 @@ vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
 
 # Specify file paths using file.path
 # Test Data - subject test, x test, and y test
-test_file_subject_test <- read.table(file.path("test", "subject_test.txt"))
+test_file_subject_test <- read.table(file.path("test", "subject_test.txt"), col.names = "Volunteer")
 test_file_X_test <- read.table(file.path("test", "X_test.txt"), col.names = t(vars_names))
 test_file_y_test <- read.table(file.path("test", "y_test.txt"))
 
@@ -31,7 +31,7 @@ test_signals <- lapply(test_file_Inertial_Signals, read.table)
 
 # Repeat for training data
 # Train Data - subject train, x train, and y train
-train_file_subject_test <- read.table(file.path("train", "subject_train.txt"))
+train_file_subject_test <- read.table(file.path("train", "subject_train.txt"), col.names = "Volunteer")
 train_file_X_test <- read.table(file.path("train", "X_train.txt"), col.names = t(vars_names))
 train_file_y_test <- read.table(file.path("train", "y_train.txt"))
 
@@ -50,6 +50,12 @@ train_signals <- lapply(train_file_Inertial_Signals, read.table)
 You should create one R script called run_analysis.R that does the following.
 
 1. Merges the training and the test sets to create one data set.
+
+  - Merge test_file_subject_test and train_file_subject_test : This is the file that specifies which volunteer. What does that even mean? 
+  - Merge test_file_X_test and train_file_X_test
+  - Merge test_file_y_test and train_file_y_test
+  - Merge train_signals and test_signals
+  - Finally, after understanding how they all come together, merge the appropriate rows/columns
 
 2. Extracts columns containing mean and standard deviation for each measurement (Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R)
 
