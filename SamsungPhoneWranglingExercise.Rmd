@@ -7,13 +7,22 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Load dplyr and tidyr packages to help tidy up the datasets.
+library("dplyr")
+library("tidyr")
+library("data.table")
 # Load up the data by using list.files and merging the wanted files into a single dataframe
 setwd("/Users/vincent_zaballa/Documents/Springboard Data Program/Section 3 Data Wrangling/SamsungPhoneDataCleaning/UCI HAR Dataset/")
+
+# Variable names from the features.txt file
+vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
+
 # Specify file paths using file.path
 # Test Data - subject test, x test, and y test
 test_file_subject_test <- read.table(file.path("test", "subject_test.txt"))
-test_file_X_test <- read.table(file.path("test", "X_test.txt"))
+test_file_X_test <- read.table(file.path("test", "X_test.txt"), col.names = t(vars_names))
 test_file_y_test <- read.table(file.path("test", "y_test.txt"))
+
 # Test Data - one leve down and reading in all the data with acc & gyro
 test_file_Inertial_Signals <- file.path("test", "Inertial Signals", c("body_acc_x_test.txt",  "body_acc_y_test.txt",  "body_acc_z_test.txt", 
 "body_gyro_x_test.txt", "body_gyro_y_test.txt", "body_gyro_z_test.txt",
@@ -23,35 +32,17 @@ test_signals <- lapply(test_file_Inertial_Signals, read.table)
 # Repeat for training data
 # Train Data - subject train, x train, and y train
 train_file_subject_test <- read.table(file.path("train", "subject_train.txt"))
-train_file_X_test <- read.table(file.path("train", "X_train.txt"))
+train_file_X_test <- read.table(file.path("train", "X_train.txt"), col.names = t(vars_names))
 train_file_y_test <- read.table(file.path("train", "y_train.txt"))
-# Test Data - one leve down and reading in all the data with acc & gyro
+
+# Train Data - one leve down and reading in all the data with acc & gyro
 train_file_Inertial_Signals <- file.path("train", "Inertial Signals", c("body_acc_x_train.txt",  "body_acc_y_train.txt",  "body_acc_z_train.txt", 
 "body_gyro_x_train.txt", "body_gyro_y_train.txt", "body_gyro_z_train.txt",
 "total_acc_x_train.txt", "total_acc_y_train.txt", "total_acc_z_train.txt"))
 train_signals <- lapply(train_file_Inertial_Signals, read.table)
 
-# Alright, so for the features, the data is within the files and the featurename is the file name... Need to figure out how to add together the file's data and then make a column name with the file's title
+# Alright, so for the features, the data is within the files and the featurename is the file name... Need to figure out how to add together the file's data and then make a column name with the file's title. So, 9 measurements have 128 variables with 2947 observations.
 
-# Function to process each file
-processFile <- function(f) {
-  df <- read.csv(f)
-  # ...and do stuff...
-  file.info(f)$size # dummy result
-}
-
-# Find all .csv files
-files <- dir("/foo/bar/", recursive=TRUE, full.names=TRUE, pattern="\\.csv$")
-
-# Apply the function to all files.
-result <- sapply(files, processFile)
-
-# Convert into a local data frame
-data <- tbl_df(data)
-
-# Load dplyr and tidyr packages to help tidy up the datasets.
-library("dplyr")
-library("tidyr")
 ```
 
 ## Samsung Phone Data Wrangling Exercise
@@ -62,13 +53,18 @@ You should create one R script called run_analysis.R that does the following.
 
 2. Extracts columns containing mean and standard deviation for each measurement (Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R)
 
+  - From the blog post about this data:  "Ah yes, but you only want certain columns. Well, either a good educated guess or reading some of the other information files will point you towards which columns contain mean and standard deviation values. What R functions do you know that can find text patterns in character vectors? Can you think how to use the output of such a function to give you a way to select only certain columns?"
+
 3. Creates variables called ActivityLabel and ActivityName that label all observations with the corresponding activity labels and names respectively
 
 From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 ```{r}
-# Merge training and test sets
+# Merge training and test sets. Don't use bind_rows becaue that just blindly concatenates the rows together. There are 9 different lists that each need to be connected according to which list they are within. Let's start by naming each of the 9 elements within each list.
+vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
 
+# Might want to use the row.names or col.names arguements earlier when first reading this dataset. That means this will go before the whole data reading portion.
+bind_rows(test_signals, train_signals)
 ```
 
 ## Including Plots
