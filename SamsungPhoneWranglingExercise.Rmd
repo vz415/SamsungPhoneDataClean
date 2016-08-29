@@ -56,6 +56,7 @@ You should create one R script called run_analysis.R that does the following.
   - Merge test_file_y_test and train_file_y_test
   - Merge train_signals and test_signals
   - Finally, after understanding how they all come together, merge the appropriate rows/columns
+  - Also, need to create an algorithm that counts the number of unique test subjects. 
 
 2. Extracts columns containing mean and standard deviation for each measurement (Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R)
 
@@ -67,6 +68,8 @@ From the data set in step 3, creates a second, independent tidy data set with th
 
 ```{r}
 # Merge training and test sets. Don't use bind_rows becaue that just blindly concatenates the rows together. There are 9 different lists that each need to be connected according to which list they are within. Let's start by naming each of the 9 elements within each list.
+unique_train_indices <- row(unique(train_file_subject_test), as.factor = T)
+unique_test_indices <- row(unique(test_file_subject_test), as.factor = T)
 vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
 
 # Might want to use the row.names or col.names arguements earlier when first reading this dataset. That means this will go before the whole data reading portion.
