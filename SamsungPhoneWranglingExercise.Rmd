@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library("dplyr")
 library("tidyr")
 library("data.table")
+library("plyr")
 # Load up the data by using list.files and merging the wanted files into a single dataframe
 setwd("/Users/vincent_zaballa/Documents/Springboard Data Program/Section 3 Data Wrangling/SamsungPhoneDataCleaning/UCI HAR Dataset/")
 
@@ -21,7 +22,8 @@ vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
 # Test Data - subject test, x test, and y test
 test_file_subject_test <- read.table(file.path("test", "subject_test.txt"), col.names = "Volunteer")
 test_file_X_test <- read.table(file.path("test", "X_test.txt"), col.names = t(vars_names))
-test_file_y_test <- read.table(file.path("test", "y_test.txt"))
+# Name the function done "activity"
+test_file_y_test <- read.table(file.path("test", "y_test.txt"), col.names = "Activity")
 
 # Test Data - one leve down and reading in all the data with acc & gyro
 test_file_Inertial_Signals <- file.path("test", "Inertial Signals", c("body_acc_x_test.txt",  "body_acc_y_test.txt",  "body_acc_z_test.txt", 
@@ -33,7 +35,8 @@ test_signals <- lapply(test_file_Inertial_Signals, read.table)
 # Train Data - subject train, x train, and y train
 train_file_subject_test <- read.table(file.path("train", "subject_train.txt"), col.names = "Volunteer")
 train_file_X_test <- read.table(file.path("train", "X_train.txt"), col.names = t(vars_names))
-train_file_y_test <- read.table(file.path("train", "y_train.txt"))
+# Name function don "activity"
+train_file_y_test <- read.table(file.path("train", "y_train.txt"), col.names = "Activity")
 
 # Train Data - one leve down and reading in all the data with acc & gyro
 train_file_Inertial_Signals <- file.path("train", "Inertial Signals", c("body_acc_x_train.txt",  "body_acc_y_train.txt",  "body_acc_z_train.txt", 
@@ -57,23 +60,46 @@ You should create one R script called run_analysis.R that does the following.
   - Merge train_signals and test_signals
   - Finally, after understanding how they all come together, merge the appropriate rows/columns
   - Also, need to create an algorithm that counts the number of unique test subjects. 
+  - Order doesn't really matter for this type of operation. Just need to concatenate the participants. Theoretically, order could matter if there was an error in the experimental methods of the experiment, but I'll come back to this later... Make an algorithm to sort which vector has the higher patient value and then switch to the lower number. 
 
 2. Extracts columns containing mean and standard deviation for each measurement (Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R)
 
   - From the blog post about this data:  "Ah yes, but you only want certain columns. Well, either a good educated guess or reading some of the other information files will point you towards which columns contain mean and standard deviation values. What R functions do you know that can find text patterns in character vectors? Can you think how to use the output of such a function to give you a way to select only certain columns?"
+  - More wisdom: "Can you find the file that codes which observation is associated with particular subjects? And the file that codes which observation is associated with a particular activity?" Working on it.
 
 3. Creates variables called ActivityLabel and ActivityName that label all observations with the corresponding activity labels and names respectively
 
 From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 ```{r}
-# Merge training and test sets. Don't use bind_rows becaue that just blindly concatenates the rows together. There are 9 different lists that each need to be connected according to which list they are within. Let's start by naming each of the 9 elements within each list.
-unique_train_indices <- row(unique(train_file_subject_test), as.factor = T)
-unique_test_indices <- row(unique(test_file_subject_test), as.factor = T)
-vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
+# Combining datasets to make one dataframe. First combining training and test data by rows.
+X_tests <- bind_rows(test_file_X_test, train_file_X_test)
+y_tests <- bind_rows(test_file_y_test, train_file_y_test)
+subject_tests <- bind_rows(test_file_subject_test, train_file_subject_test)
+# Combining the columns
+Compiled_higherdata <- bind_cols(X_tests, y_tests, subject_tests)
 
-# Might want to use the row.names or col.names arguements earlier when first reading this dataset. That means this will go before the whole data reading portion.
-bind_rows(test_signals, train_signals)
+# Start by tracking indices of subjects.
+unique_subjects_indices <- row(unique(subject_tests), as.factor = T)
+
+# Make a loop that finds and lists the number and types of tests performed on each subject. Looks like I'll use the adply function that splits an array, applies a function, and returns the results in a data frame. perf.
+numeric_subjects_indices <- as.numeric(levels(unique_subjects_indices))[unique_subjects_indices]
+# Ok, can use the duplicated function to find duplicates. To solve the problem of mutliple tests, can use an if statement that says that "if 6 duplicates have been found, restart the duplicate search at the next number" Just need to figure out how to go to the next number from the last duplicate. Know this should only be performed twice. Find indices. 
+for (i in 1:(1-length(numeric_subjects_indices))) {
+  subject_y_test <- numeric_subjects_indices[i+1]
+  # Below are ideas of what to do to find subject_y_test
+  which(duplicated(y_tests[1:(303)-1,]) == F) # indices output
+  adply(y_tests[i:(i+1)-1,])
+}
+
+
+# Find the indices for tests performed by each subject. Need to apply for loop that repeats unique locations for each test for each subject.
+unique_rows <- function (uniques) {
+  row(unique(uniques), as.factor = T)
+}
+
+# First attempt at finding the unique test that a patient performed.
+unique_subjtests <- lapply(y_tests, unique_rows)
 ```
 
 ## Including Plots
