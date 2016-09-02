@@ -84,6 +84,7 @@ unique_subjects_indices <- row(unique(subject_tests), as.factor = T)
 
 # Make a loop that finds and lists the number and types of tests performed on each subject. Looks like I'll use the adply function that splits an array, applies a function, and returns the results in a data frame. perf.
 numeric_subjects_indices <- as.numeric(levels(unique_subjects_indices))[unique_subjects_indices]
+
 # Ok, can use the duplicated function to find duplicates. To solve the problem of mutliple tests, can use an if statement that says that "if 6 duplicates have been found, restart the duplicate search at the next number" Just need to figure out how to go to the next number from the last duplicate. Know this should only be performed twice. Find indices. 
 for (i in 1:(1-length(numeric_subjects_indices))) {
   subject_y_test <- numeric_subjects_indices[i+1]
