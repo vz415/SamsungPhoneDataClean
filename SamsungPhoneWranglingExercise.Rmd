@@ -81,17 +81,44 @@ Compiled_higherdata <- bind_cols(X_tests, y_tests, subject_tests)
 
 # Start by tracking indices of subjects.
 unique_subjects_indices <- row(unique(subject_tests), as.factor = T)
-
-# Make a loop that finds and lists the number and types of tests performed on each subject. Looks like I'll use the adply function that splits an array, applies a function, and returns the results in a data frame. perf.
 numeric_subjects_indices <- as.numeric(levels(unique_subjects_indices))[unique_subjects_indices]
 
+# Identify only the columns with mean or stddev. Start by finding indices of vars_names
+mean_indices <- which(as.character(grepl(".mean.", vars_names[,1])) == "TRUE")
+Mean_indices <- which(as.character(grepl(".Mean.", vars_names[,1])) == "TRUE")
+std_indices <- which(as.character(grepl(".std.", vars_names[,1])) == "TRUE")
+vars_indices_keep <- sort(c(mean_indices, std_indices, Mean_indices))
+# Apply to original dataset, but remember to keep activity and subject columns (562 & 563)
+Compiled_higherdata <- Compiled_higherdata[,c(vars_indices_keep, 562, 563)]
+
+# Change the tests from numbers to descriptive factors. Use ifelse statements.
+Compiled_higherdata$Activity <- 
+  ifelse(Compiled_higherdata$Activity == "1", "Walking", 
+  ifelse(Compiled_higherdata$Activity == "2", "Walking_Upstairs", 
+  ifelse(Compiled_higherdata$Activity == "3", "Walking_Downstairs",
+  ifelse(Compiled_higherdata$Activity == "4", "Sitting", 
+  ifelse(Compiled_higherdata$Activity == "5", "Standing", 
+  ifelse(Compiled_higherdata$Activity == "6", "Laying", "NA"))))))
+
+```
+
+## Future Work
+
+The following code will match the subject with each test performed. Will know when they were performing each task and for how long. Good for future analysis. 
+
+```{r}
+# Make a loop that finds and lists the number and types of tests performed on each subject. Do this Section later later.
+
 # Ok, can use the duplicated function to find duplicates. To solve the problem of mutliple tests, can use an if statement that says that "if 6 duplicates have been found, restart the duplicate search at the next number" Just need to figure out how to go to the next number from the last duplicate. Know this should only be performed twice. Find indices. 
-for (i in 1:(1-length(numeric_subjects_indices))) {
+for (i in 1:(length(numeric_subjects_indices) - 1)) {
   subject_y_test <- numeric_subjects_indices[i+1]
   # Below are ideas of what to do to find subject_y_test
-  which(duplicated(y_tests[1:(303)-1,]) == F) # indices output
+  which(duplicated(y_tests[1:(303)-1,]) == F ) # indices output
   adply(y_tests[i:(i+1)-1,])
-}
+  subj_test_index[(2 * i - 1),] <- y_tests[numeric_subjects_indices[i] + c( which( duplicated( y_tests[numeric_subjects_indices[i] : (numeric_subjects_indices[i+1]-1),]) == F )),]
+  next # Use this once the first iteration of unique indices has been found
+  subj_test_index[(2 * i),] <- y_tests[ numeric_subjects_indices[i] + c( which( duplicated( y_tests[ numeric_subjects_indices[i]: (numeric_subjects_indices[i+1]-1),]) == F )),]
+}   # What is the output going to be? A vector indicating the indices of the which subject performed which test, maybe. Know the output will be "5 4 6 1 3 2", so maybe there's an easier way than trying to geuss the middle point of the range.
 
 
 # Find the indices for tests performed by each subject. Need to apply for loop that repeats unique locations for each test for each subject.
@@ -101,14 +128,6 @@ unique_rows <- function (uniques) {
 
 # First attempt at finding the unique test that a patient performed.
 unique_subjtests <- lapply(y_tests, unique_rows)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
