@@ -22,8 +22,8 @@ vars_names <- read.table("features.txt", colClasses = c("NULL",NA))
 # Test Data - subject test, x test, and y test
 test_file_subject_test <- read.table(file.path("test", "subject_test.txt"), col.names = "Volunteer")
 test_file_X_test <- read.table(file.path("test", "X_test.txt"), col.names = t(vars_names))
-# Name the function done "activity"
-test_file_y_test <- read.table(file.path("test", "y_test.txt"), col.names = "Activity")
+# Name the function done "ActivityLabel"
+test_file_y_test <- read.table(file.path("test", "y_test.txt"), col.names = "ActivityLabel")
 
 # Test Data - one leve down and reading in all the data with acc & gyro
 test_file_Inertial_Signals <- file.path("test", "Inertial Signals", c("body_acc_x_test.txt",  "body_acc_y_test.txt",  "body_acc_z_test.txt", 
@@ -35,8 +35,8 @@ test_signals <- lapply(test_file_Inertial_Signals, read.table)
 # Train Data - subject train, x train, and y train
 train_file_subject_test <- read.table(file.path("train", "subject_train.txt"), col.names = "Volunteer")
 train_file_X_test <- read.table(file.path("train", "X_train.txt"), col.names = t(vars_names))
-# Name function don "activity"
-train_file_y_test <- read.table(file.path("train", "y_train.txt"), col.names = "Activity")
+# Name function "ActivityLabel"
+train_file_y_test <- read.table(file.path("train", "y_train.txt"), col.names = "ActivityLabel")
 
 # Train Data - one leve down and reading in all the data with acc & gyro
 train_file_Inertial_Signals <- file.path("train", "Inertial Signals", c("body_acc_x_train.txt",  "body_acc_y_train.txt",  "body_acc_z_train.txt", 
@@ -67,10 +67,6 @@ You should create one R script called run_analysis.R that does the following.
   - From the blog post about this data:  "Ah yes, but you only want certain columns. Well, either a good educated guess or reading some of the other information files will point you towards which columns contain mean and standard deviation values. What R functions do you know that can find text patterns in character vectors? Can you think how to use the output of such a function to give you a way to select only certain columns?"
   - More wisdom: "Can you find the file that codes which observation is associated with particular subjects? And the file that codes which observation is associated with a particular activity?" Working on it.
 
-3. Creates variables called ActivityLabel and ActivityName that label all observations with the corresponding activity labels and names respectively
-
-From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
 ```{r}
 # Combining datasets to make one dataframe. First combining training and test data by rows.
 X_tests <- bind_rows(test_file_X_test, train_file_X_test)
@@ -88,17 +84,31 @@ mean_indices <- which(as.character(grepl(".mean.", vars_names[,1])) == "TRUE")
 Mean_indices <- which(as.character(grepl(".Mean.", vars_names[,1])) == "TRUE")
 std_indices <- which(as.character(grepl(".std.", vars_names[,1])) == "TRUE")
 vars_indices_keep <- sort(c(mean_indices, std_indices, Mean_indices))
-# Apply to original dataset, but remember to keep activity and subject columns (562 & 563)
+# Apply to original dataset, but remember to keep ActivityLabel, ActivityName and subject columns (562 & 563)
 Compiled_higherdata <- Compiled_higherdata[,c(vars_indices_keep, 562, 563)]
 
-# Change the tests from numbers to descriptive factors. Use ifelse statements.
-Compiled_higherdata$Activity <- 
+```
+
+## Creating variables ActivityLabel and ActivityName
+
+3. Creates variables called ActivityLabel and ActivityName that label all observations with the corresponding activity labels and names respectively
+
+4. From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+Thoughts: "Can you find the file that codes which observation is associated with particular subjects? And the file that codes which observation is associated with a particular activity? Obviously in both cases, the files you're looking for will have the same length as the number of observations. How do you now combine them with your data (measurement) data frame? And how do you interpret the activity, which is just a number? We want something more meaningful. Which file relates activity number to its label/description? Can you now use this to add a new column that has the appropriate activity label?" 
+
+```{r}
+# Convert the tests from numbers to descriptive factors that will be used for ActivityNames. Use ifelse statements and mutate. 
+Compiled_higherdata$Activity <- mutate( "ActivityLabel" ==
   ifelse(Compiled_higherdata$Activity == "1", "Walking", 
   ifelse(Compiled_higherdata$Activity == "2", "Walking_Upstairs", 
   ifelse(Compiled_higherdata$Activity == "3", "Walking_Downstairs",
   ifelse(Compiled_higherdata$Activity == "4", "Sitting", 
   ifelse(Compiled_higherdata$Activity == "5", "Standing", 
-  ifelse(Compiled_higherdata$Activity == "6", "Laying", "NA"))))))
+  ifelse(Compiled_higherdata$Activity == "6", "Laying", "NA")))))))
+
+# Create independent tidy data set with the average of each variable for each activity and subject
+tidy_date <- 
 
 ```
 
