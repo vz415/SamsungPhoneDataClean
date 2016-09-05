@@ -107,8 +107,8 @@ Compiled_higherdata <- mutate(Compiled_higherdata, ActivityName =
   ifelse(Compiled_higherdata$Activity == "5", "Standing", 
   ifelse(Compiled_higherdata$Activity == "6", "Laying", "NA")))))))
 
-# Create independent tidy data set with the average of each variable for each activity and subject
-#tidy_date <- 
+# Create independent tidy data set with the average of each variable for each activity and subject. To do this, going to compress all activities for each subject and output the average of that value. 
+
 
 ```
 
