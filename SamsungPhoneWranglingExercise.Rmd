@@ -107,7 +107,20 @@ Compiled_higherdata <- mutate(Compiled_higherdata, ActivityName =
   ifelse(Compiled_higherdata$Activity == "5", "Standing", 
   ifelse(Compiled_higherdata$Activity == "6", "Laying", "NA")))))))
 
-# Create independent tidy data set with the average of each variable for each activity and subject. To do this, going to compress all activities for each subject and output the average of that value. 
+# Create independent tidy data set with the average of each variable for each activity and subject. To do this, going to compress all activities for each subject and output the average of that value. Basically, gon' need to find average of activities 1-6 for subjects 1-30. Cool. go by each subject then by each activity, then just use the summarise(average) function in dplyr
+# Try using head() function to split into the activities for each subject.
+
+tidyData <- matrix(0,nrow=(max(unique(subject_tests)) * max(unique(test_file_y_test))),
+                     ncol= length(Compiled_higherdata) - 3) 
+for (i in 1: length(vars_indices_keep)) {
+  # By each subject, i, find the average of each activity by using mn84_90 <- with(datfrm, mean(score[year >= 1984 & year <= 1990]) ), basically, the 'with' funciton.
+  for (j in 1: max(unique(Compiled_higherdata$Subject))) {
+    for (k in 1:6){ 
+    test[j+k-1,i] <- with(Compiled_higherdata, mean(Compiled_higherdata[,j][ActivityLabel == k & Subject == i]))
+    # Need to think about how to organize this data. There will probably be a variable for each indication. That means multiple variables will then need to be bound together.
+    }
+  }
+} # Also need to count the number of times activitylabel and subject is used here. 
 
 
 ```
